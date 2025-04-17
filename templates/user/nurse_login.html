@@ -4,18 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>护士登录</title>
-    <!-- 引入本地 Bootstrap CSS 文件 -->
+    <title>Nurse Login</title>
+    <!-- Bootstrap CSS -->
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-    <!-- 自定义的 CSS 文件 -->
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <style>
-
+        /* Add custom styles here if needed */
     </style>
 </head>
 <body>
-    <h2>护士登录</h2>
-    <!-- 错误提示信息 -->
+    <h2>Nurse Login</h2>
+
+    <!-- Error messages -->
     {% if form.non_field_errors %}
         <div class="alert alert-danger">
             {{ form.non_field_errors }}
@@ -25,7 +26,7 @@
     <form method="post" action="{% url 'nurse_login' %}">
         {% csrf_token %}
         <div class="form-group">
-            <label for="{{ form.nurse_contact_number.id_for_label }}">护士账号:</label>
+            <label for="{{ form.nurse_contact_number.id_for_label }}">Nurse Account:</label>
             {{ form.nurse_contact_number }}
             {% if form.nurse_contact_number.errors %}
                 <div class="text-danger">
@@ -34,7 +35,7 @@
             {% endif %}
         </div>
         <div class="form-group">
-            <label for="{{ form.nurse_password.id_for_label }}">密码:</label>
+            <label for="{{ form.nurse_password.id_for_label }}">Password:</label>
             {{ form.nurse_password }}
             {% if form.nurse_password.errors %}
                 <div class="text-danger">
@@ -44,13 +45,14 @@
         </div>
         <div class="form-group form-check">
             <input type="checkbox" class="form-check-input" id="savePassword">
-            <label class="form-check-label" for="savePassword">保存密码</label>
+            <label class="form-check-label" for="savePassword">Remember Password</label>
         </div>
-        <button type="submit" class="btn btn-success">登录</button>
+        <button type="submit" class="btn btn-success">Login</button>
     </form>
-    <p>还没有账号？<a href="{% url 'nurse_register' %}">注册</a></p>
 
-    <!-- 引入本地 Bootstrap JS 文件 -->
+    <p>Don't have an account? <a href="{% url 'nurse_register' %}">Register</a></p>
+
+    <!-- Bootstrap JS -->
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 </body>

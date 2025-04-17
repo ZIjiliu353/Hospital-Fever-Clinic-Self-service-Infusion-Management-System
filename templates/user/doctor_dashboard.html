@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>医生主页</title>
+    <title>Doctor Dashboard</title>
     <style>
-        /* 全局样式 */
+        /* Global styles */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -13,13 +13,13 @@
             background-color: #f0f0f0;
         }
 
-        /* 主容器样式 */
+        /* Main container */
         .container {
             display: flex;
             height: 100vh;
         }
 
-        /* 侧边栏样式 */
+        /* Sidebar styles */
         .sidebar {
             width: 200px;
             background-color: #333;
@@ -41,7 +41,7 @@
             background-color: #555;
         }
 
-        /* 主内容区样式 */
+        /* Main content area */
         .main-content {
             flex: 1;
             padding: 20px;
@@ -49,7 +49,7 @@
             color: #333;
         }
 
-        /* 静态文本样式 */
+        /* Static label */
         .static-text {
             color: #fff;
             padding: 20px 10px;
@@ -60,39 +60,37 @@
 </head>
 <body>
     <div class="container">
-        <!-- 侧边栏 -->
+        <!-- Sidebar -->
         <div class="sidebar">
-            <div class="static-text">发热门诊输液管理系统</div>
-            <a href="{% url 'doctor_profile' %}">查看个人信息</a>
-            <a href="{% url 'medication_list' %}">药物管理</a>
-            <a href="{% url 'appointment_handling' %}">预约处理</a>
-            <a href="#" onclick="logout()">退出登录</a>
+            <div class="static-text">Fever Clinic Infusion Management System</div>
+            <a href="{% url 'doctor_profile' %}">View Profile</a>
+            <a href="{% url 'medication_list' %}">Medication Management</a>
+            <a href="{% url 'appointment_handling' %}">Appointment Handling</a>
+            <a href="#" onclick="logout()">Logout</a>
         </div>
 
-        <!-- 主内容区 -->
+        <!-- Main content area -->
         <div class="main-content" id="mainContent">
-            <h1>欢迎访问医生主页</h1>
-            <p>在这里您可以查看个人信息、管理药物、处理预约。</p>
+            <h1>Welcome to the Doctor Dashboard</h1>
+            <p>Here you can view your profile, manage medications, and handle appointments.</p>
         </div>
     </div>
 
     <script>
-        // 退出登录
+        // Logout function
         function logout() {
-            // 执行退出登录的逻辑，例如清除会话信息
-            // 这里假设使用 AJAX 请求来告知服务器清除相应的会话信息
+            // Perform logout logic, such as clearing session data
+            // This assumes using an AJAX request to notify the server
             fetch('/logout', {
-                method: 'POST', // 假设使用 POST 请求
-                credentials: 'same-origin', // 发送同源凭证以便服务器清除相应的会话信息
+                method: 'POST',
+                credentials: 'same-origin',
             })
             .then(response => {
-                // 构建登录页面 URL
                 const loginUrl = '/user/doctor/login/';
-                // 重定向到登录页面
                 window.location.href = loginUrl;
             })
             .catch(error => {
-                console.error('退出登录失败：', error);
+                console.error('Logout failed:', error);
             });
         }
     </script>

@@ -3,26 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>医生注册</title>
+    <title>Doctor Registration</title>
 </head>
 <body>
-    <h2>医生注册</h2>
+    <h2>Doctor Registration</h2>
     <form method="post" action="{% url 'doctor_register' %}">
         {% csrf_token %}
 
-    {% if error_message %}
-        <!-- 显示错误消息，并设置为红色 -->
-        <p style="color: red;">{{ error_message }}</p>
-    {% endif %}
+        {% if error_message %}
+            <!-- Display error message in red -->
+            <p style="color: red;">{{ error_message }}</p>
+        {% endif %}
 
         {{ form.as_p }}
-        <button type="submit">注册</button>
+
+        <button type="submit">Register</button>
     </form>
 
     {% if success_message %}
         <p style="color: green;">{{ success_message }}</p>
     {% endif %}
 
-    <p>已有账号？<a href="{% url 'doctor_login' %}">登录</a></p>
+    <p>Already have an account? <a href="{% url 'doctor_login' %}">Login</a></p>
 </body>
 </html>

@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>护士主页</title>
+    <title>Nurse Dashboard</title>
     <style>
-        /* 全局样式 */
+        /* Global Styles */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -13,13 +13,13 @@
             background-color: #f0f0f0;
         }
 
-        /* 主容器样式 */
+        /* Container */
         .container {
             display: flex;
             height: 100vh;
         }
 
-        /* 侧边栏样式 */
+        /* Sidebar */
         .sidebar {
             width: 200px;
             background-color: #333;
@@ -41,7 +41,7 @@
             background-color: #555;
         }
 
-        /* 主内容区样式 */
+        /* Main Content */
         .main-content {
             flex: 1;
             padding: 20px;
@@ -49,7 +49,7 @@
             color: #333;
         }
 
-        /* 静态文本样式 */
+        /* Static label */
         .static-text {
             color: #fff;
             padding: 20px 10px;
@@ -60,40 +60,36 @@
 </head>
 <body>
     <div class="container">
-        <!-- 侧边栏 -->
+        <!-- Sidebar -->
         <div class="sidebar">
-            <div class="static-text">发热门诊输液管理系统</div>
-            <a href="{% url 'nurse_profile' %}">查看个人信息</a>
-            <a href="{% url 'medication_list' %}">药物管理</a>
-            <a href="{% url 'nurse_infusion' %}">输液管理</a>
-            <a href="{% url 'nurse_infusion_history' %}">查看输液安排历史</a>
-            <a href="#" onclick="logout()">退出登录</a>
+            <div class="static-text">Fever Clinic Infusion Management System</div>
+            <a href="{% url 'nurse_profile' %}">View Profile</a>
+            <a href="{% url 'medication_list' %}">Medication Management</a>
+            <a href="{% url 'nurse_infusion' %}">Infusion Management</a>
+            <a href="{% url 'nurse_infusion_history' %}">View Infusion History</a>
+            <a href="#" onclick="logout()">Logout</a>
         </div>
 
-        <!-- 主内容区 -->
+        <!-- Main Content -->
         <div class="main-content" id="mainContent">
-            <h1>欢迎访问护士主页</h1>
-            <p>在这里您可以查看个人信息、药物管理、输液管理、查看输液安排历史。</p>
+            <h1>Welcome to the Nurse Dashboard</h1>
+            <p>Here you can view your profile, manage medications, handle infusions, and review infusion history.</p>
         </div>
     </div>
 
     <script>
-        // 退出登录
+        // Logout
         function logout() {
-            // 执行退出登录的逻辑，例如清除会话信息
-            // 这里假设使用 AJAX 请求来告知服务器清除相应的会话信息
             fetch('/logout', {
-                method: 'POST', // 假设使用 POST 请求
-                credentials: 'same-origin', // 发送同源凭证以便服务器清除相应的会话信息
+                method: 'POST',
+                credentials: 'same-origin',
             })
             .then(response => {
-                // 构建登录页面 URL
                 const loginUrl = '/user/nurse/login/';
-                // 重定向到登录页面
                 window.location.href = loginUrl;
             })
             .catch(error => {
-                console.error('退出登录失败：', error);
+                console.error('Logout failed:', error);
             });
         }
     </script>

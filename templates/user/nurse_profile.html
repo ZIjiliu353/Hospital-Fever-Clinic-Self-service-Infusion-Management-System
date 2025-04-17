@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>护士个人信息</title>
+    <title>Nurse Profile</title>
     <style>
-        /* 按钮样式 */
+        /* Button styles */
         .btn {
             display: inline-block;
             padding: 10px 20px;
@@ -17,12 +17,12 @@
             cursor: pointer;
         }
 
-        /* 鼠标悬停时的样式 */
+        /* Hover effect */
         .btn:hover {
             background-color: #0056b3;
         }
 
-        /* 编辑表单容器样式 */
+        /* Edit form container */
         #editContainer {
             display: none;
         }
@@ -30,23 +30,23 @@
 </head>
 <body>
 
-    <h2>护士个人信息</h2>
-    <p>姓名：{{ nurse.name }}</p>
+    <h2>Nurse Profile</h2>
+    <p>Full Name: {{ nurse.name }}</p>
     {% if nurse.gender == 'm' %}
-        <p>性别：男</p>
+        <p>Gender: Male</p>
     {% elif nurse.gender == 'f' %}
-        <p>性别：女</p>
+        <p>Gender: Female</p>
     {% endif %}
-    <p>年龄：{{ nurse.age }}</p>
-    <p>科室：{{ nurse.department }}</p>
-    <p>职称：{{ nurse.title }}</p>
-    <p>护士介绍：{{ nurse.info }}</p>
-    <p>联系电话/账号：{{ nurse.contact_number }}</p>
+    <p>Age: {{ nurse.age }}</p>
+    <p>Department: {{ nurse.department }}</p>
+    <p>Title: {{ nurse.title }}</p>
+    <p>Biography: {{ nurse.info }}</p>
+    <p>Phone Number / Username: {{ nurse.contact_number }}</p>
 
-    <!-- 编辑按钮 -->
-    <a href="{% url 'nurse_edit_profile' %}" class="btn">编辑个人信息</a>
-    <!-- 返回按钮 -->
-    <a href="/user/nurse_dashboard/" class="btn">返回仪表板</a>
+    <!-- Edit button -->
+    <a href="{% url 'nurse_edit_profile' %}" class="btn">Edit Profile</a>
+    <!-- Back button -->
+    <a href="/user/nurse_dashboard/" class="btn">Back to Dashboard</a>
 
 </body>
 </html>

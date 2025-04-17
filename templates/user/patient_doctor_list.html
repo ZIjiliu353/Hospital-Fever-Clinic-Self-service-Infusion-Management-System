@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>所有医生信息</title>
+    <title>All Doctors Information</title>
     <style>
-        /* 按钮样式 */
+        /* Button styles */
         .btn {
             display: inline-block;
             padding: 10px 20px;
@@ -17,19 +17,19 @@
             cursor: pointer;
         }
 
-        /* 鼠标悬停时的样式 */
+        /* Hover effect */
         .btn:hover {
             background-color: #0056b3;
         }
     </style>
 </head>
 <body>
-    <h2>所有医生信息</h2>
+    <h2>All Doctors</h2>
     <ul>
         {% for doctor in doctors %}
             <div class="doctor-info">
                 <p>{{ doctor.name }} - {{ doctor.department }} - {{ doctor.title }}</p>
-                <a href="{% url 'doctor_detail' doctor_id=doctor.doctor_id %}" class="btn">查看更多信息</a>
+                <a href="{% url 'doctor_detail' doctor_id=doctor.doctor_id %}" class="btn">View More</a>
             </div>
         {% endfor %}
     </ul>
