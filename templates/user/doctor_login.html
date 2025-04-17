@@ -1,0 +1,57 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医生登录</title>
+    <!-- 引入本地 Bootstrap CSS 文件 -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- 自定义的 CSS 文件 -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+
+    </style>
+</head>
+<body>
+    <h2>医生登录</h2>
+    <!-- 错误提示信息 -->
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
+
+    <form method="post" action="{% url 'doctor_login' %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="{{ form.doctor_contact_number.id_for_label }}">医生账号:</label>
+            {{ form.doctor_contact_number }}
+            {% if form.doctor_contact_number.errors %}
+                <div class="text-danger">
+                    {{ form.doctor_contact_number.errors }}
+                </div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label for="{{ form.doctor_password.id_for_label }}">密码:</label>
+            {{ form.doctor_password }}
+            {% if form.doctor_password.errors %}
+                <div class="text-danger">
+                    {{ form.doctor_password.errors }}
+                </div>
+            {% endif %}
+        </div>
+        <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="savePassword">
+            <label class="form-check-label" for="savePassword">保存密码</label>
+        </div>
+        <button type="submit" class="btn btn-success">登录</button>
+    </form>
+    <p>还没有账号？<a href="{% url 'doctor_register' %}">注册</a></p>
+
+    <!-- 引入本地 Bootstrap JS 文件 -->
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

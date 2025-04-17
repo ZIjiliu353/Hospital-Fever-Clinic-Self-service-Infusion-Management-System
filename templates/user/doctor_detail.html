@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医生详细信息</title>
+    <style>
+        /* 按钮样式 */
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* 鼠标悬停时的样式 */
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h2>{{ doctor.name }} 的详细信息</h2>
+    <p>姓名：{{ doctor.name }}</p>
+    <p>性别：{{ doctor.get_gender_display }}</p>
+    <p>年龄：{{ doctor.age }}</p>
+    <p>科室：{{ doctor.department }}</p>
+    <p>职称：{{ doctor.title }}</p>
+    <p>医生介绍：{{ doctor.info }}</p>
+    <p>联系电话/账号：{{ doctor.contact_number }}</p>
+
+    <a href="{% url 'patient_doctor_list' %}" class="btn">返回医生列表</a>
+    <a href="/user/patient_dashboard/" class="btn">返回仪表板</a>
+</body>
+</html>

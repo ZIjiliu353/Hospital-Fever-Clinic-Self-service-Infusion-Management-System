@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医生预约处理</title>
+    <!-- 引入 Element UI 的 CSS 文件 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <style>
+        .container {
+            width: 80%;
+            margin: auto;
+            padding-top: 50px;
+        }
+        .doctor-actions {
+            margin-top: 20px;
+        }
+        .doctor-actions button {
+            margin-right: 10px;
+        }
+
+
+    </style>
+</head>
+<body>
+    <div id="app" class="container">
+        <el-table
+            :data="appointments"
+            style="width: 100%">
+            <el-table-column
+                prop="doctor_name"
+                label="医生名字">
+            </el-table-column>
+            <el-table-column
+                prop="patient_name"
+                label="病人名字">
+            </el-table-column>
+            <el-table-column
+                prop="appointment_date"
+                label="预约日期">
+            </el-table-column>
+            <el-table-column
+                prop="appointment_time"
+                label="预约时段"
+                :formatter="formatAppointmentTime">
+            </el-table-column>
+            <el-table-column
+                prop="infusion_reason"
+                label="输液原因">
+            </el-table-column>
+            <el-table-column
+                prop="medication"
+                label="药物">
+            </el-table-column>
+            <el-table-column
+                prop="dosage"
+                label="剂量">
+            </el-table-column>
+            <el-table-column
+                prop="status"
+                label="状态">
+                <template slot-scope="scope">
+                    <span v-if="scope.row.status === 'pending'">待处理</span>
+                    <span v-if="scope.row.status === 'completed'">已完成</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="操作" width="140"  align="center">
+                <template slot-scope="scope">
+                    <div class="action-buttons">
+                        <el-button type="text" size="mini" @click="handleAppointment(scope.row)">预约处理</el-button>
+                        <el-button type="text" size="mini" @click="viewPatientDetails(scope.row)">病人详情</el-button>
+                    </div>
+                </template>
+            </el-table-column>
+        </el-table>
+
+        <!-- 模态框 -->
+        <el-dialog
+          title="处理预约"
+          :visible.sync="dialogVisible"
+          width="30%"
+          center>
+          <el-form ref="form" :model="form" label-width="80px">
+              <!-- 添加隐藏的预约ID字段 -->
+            <input type="hidden" v-model="form.appointment_id">
+
+            <el-form-item label="药物">
+              <el-select v-model="form.medication" placeholder="请选择药物" @change="logMedication">
+                <el-option
+                    v-for="medication in medications"
+                    :key="medication.id"
+                    :label="medication.name + '（余额：' + medication.current_quantity + '）'"
+                    :value="medication.id"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="剂量">
+                <el-select v-model="form.dosage" placeholder="请选择剂量">
+                    <el-option
+                        v-for="num in 10"
+                        :key="num"
+                        :label="num"
+                        :value="num"
+                    ></el-option>
+                </el-select>
+            </el-form-item>
+          </el-form>
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="dialogVisible = false">取消</el-button>
+            <el-button type="primary" @click="confirmHandle" :disabled="isConfirmDisabled">确认</el-button>
+          </span>
+        </el-dialog>
+
+        <el-button type="primary" @click="navigateToDashboard">返回仪表盘</el-button>
+    </div>
+
+    <!-- 引入 Vue.js -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <!-- 引入 axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- 引入 Element UI 库 -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+              appointments: [], // 这里存放从后端获取的预约历史数据
+              dialogVisible: false, // 模态框显示状态
+              form: {
+                medication: '', // 药物
+                dosage: '' // 剂量
+              },
+              medications: [] // 存储药物选项
+
+            },
+            computed: {
+                isConfirmDisabled() {
+                    return this.checkIsConfirmDisabled();
+                }
+            },
+            methods: {
+                    checkIsConfirmDisabled() {
+                        console.log('Checking if confirm button should be disabled...');
+                        console.log('Form Medication:', this.form.medication);
+                        console.log('Form Dosage:', this.form.dosage);
+                        console.log('Balance:', this.checkBalance());
+                        const disabled = !this.form.medication || !this.form.dosage || this.checkBalance();
+                        this.isConfirmDisabled = disabled;
+                        return disabled;
+                    },
+
+                    logMedication(medicationId) {
+                        console.log('Selected Medication ID:', medicationId);
+                        const selectedMedication = this.medications.find(med => med.medication_id === medicationId);
+                        console.log('Selected Medication:', selectedMedication);
+                    },
+
+                    checkBalance() {
+                        // 获取所选药物的余额
+                        const selectedMedicationId  = this.form.medication;
+                        const selectedMedication = this.medications.find(med => med.id === selectedMedicationId);
+
+                        if (!selectedMedication) {
+                            console.log('Selected medication not found');
+                            return true; // 如果未找到药物对象，也返回余额不足
+                        }
+
+                        const balance = selectedMedication.current_quantity;
+
+                        // 获取所选剂量
+                        const dosage = parseInt(this.form.dosage);
+
+
+                        // 输出调试信息
+                        console.log('Selected Medication:', selectedMedication);
+                        console.log('Balance:', balance);
+                        console.log('Dosage:', dosage);
+
+                        // 检查余额是否小于剂量或者为0
+                        return balance < dosage || balance === 0;
+                    },
+
+                // 获取药物数据
+                getMedications() {
+                  axios.get('/appointment/get_medications/')
+                    .then(response => {
+                      this.medications = response.data.medications;
+                    })
+                    .catch(error => {
+                      console.error('获取药物数据失败:', error);
+                    });
+                },
+                // 处理预约按钮点击事件
+                handleAppointment(row) {
+                  this.form.appointment_id = row.appointment_id;
+                  console.log('预约id:', this.form.appointment_id);
+                  this.dialogVisible = true; // 显示模态框
+                  // 设置模态框中的表单数据
+                  this.form.medication = row.medication || '';
+                  this.form.dosage = row.dosage || '';
+                  // 获取药物数据
+                  this.getMedications();
+                  console.log('选择的药物:', this.form.medication);
+                  console.log('选择的剂量:', this.form.dosage);
+                },
+                // 确认处理预约按钮点击事件
+                confirmHandle() {
+
+                    // 检查表单数据的完整性
+                    if (!this.form.appointment_id || !this.form.medication || !this.form.dosage) {
+                        console.error('表单数据不完整');
+                        return;
+                    }
+
+                    // 构造表单数据对象
+                    const formData = {
+                        appointment_id: this.form.appointment_id, // 预约ID
+                        medication_id: this.form.medication, // 药物ID
+                        dosage: this.form.dosage // 剂量
+                    };
+
+                    // 发送数据到后端
+                    axios.post('/appointment/doctor_deal_with_appointment/', formData)
+                        .then(response => {
+                            // 添加处理成功的提示信息
+                            this.$message({
+                                message: '预约处理成功！',
+                                type: 'success'
+                            });
+                            this.dialogVisible = false; // 关闭模态框
+                            // 清空表单数据
+                            this.form.medication = '';
+                            this.form.dosage = '';
+                            this.getAppointments();
+                        })
+                        .catch(error => {
+                            // 处理请求错误
+                            console.error('处理预约失败:', error);
+                            this.$message.error('预约处理失败，请重试！');
+                        });
+                },
+                formatAppointmentTime(row) {
+                    const startTime = row.appointment_time;
+                    const endTime = startTime + 1; // 结束时间为开始时间加1
+                    return `${startTime}点-${endTime}点`;
+                },
+                viewPatientDetails(row) {
+                    const patient_id = row.patient_id;
+                    window.location.href = `/appointment/patient_detail?patient_id=${patient_id}`;
+                },
+                  // 跳转到仪表盘
+                navigateToDashboard() {
+                    window.location.href = '/user/doctor_dashboard/';
+                },
+                getAppointments() {
+                    axios.get('/appointment/doctor_get_appointment_data')
+                        .then(response => {
+                            this.appointments = response.data.appointments;
+                        })
+                        .catch(error => {
+                            console.error('获取预约历史数据失败:', error);
+                        });
+                }
+            },
+            watch: {
+                'form.medication': function(newVal, oldVal) {
+                    this.checkIsConfirmDisabled();
+                },
+                'form.dosage': function(newVal, oldVal) {
+                    this.checkIsConfirmDisabled();
+                }
+            },
+            mounted() {
+                this.getAppointments();
+            }
+        });
+    </script>
+</body>
+</html>

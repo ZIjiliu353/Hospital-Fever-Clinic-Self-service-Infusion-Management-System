@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>护士个人信息</title>
+    <style>
+        /* 按钮样式 */
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* 鼠标悬停时的样式 */
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* 编辑表单容器样式 */
+        #editContainer {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>护士个人信息</h2>
+    <p>姓名：{{ nurse.name }}</p>
+    {% if nurse.gender == 'm' %}
+        <p>性别：男</p>
+    {% elif nurse.gender == 'f' %}
+        <p>性别：女</p>
+    {% endif %}
+    <p>年龄：{{ nurse.age }}</p>
+    <p>科室：{{ nurse.department }}</p>
+    <p>职称：{{ nurse.title }}</p>
+    <p>护士介绍：{{ nurse.info }}</p>
+    <p>联系电话/账号：{{ nurse.contact_number }}</p>
+
+    <!-- 编辑按钮 -->
+    <a href="{% url 'nurse_edit_profile' %}" class="btn">编辑个人信息</a>
+    <!-- 返回按钮 -->
+    <a href="/user/nurse_dashboard/" class="btn">返回仪表板</a>
+
+</body>
+</html>

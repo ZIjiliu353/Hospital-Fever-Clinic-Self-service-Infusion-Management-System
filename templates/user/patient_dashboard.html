@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>病人主页</title>
+    <style>
+        /* 全局样式 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        /* 主容器样式 */
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* 侧边栏样式 */
+        .sidebar {
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            padding-top: 30px;
+            text-align: center;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 12px 5px;
+            margin: 0 auto;
+            text-decoration: none;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .sidebar a:hover {
+            background-color: #555;
+        }
+
+        /* 主内容区样式 */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background-color: #fff;
+            color: #333;
+        }
+
+        /* 静态文本样式 */
+        .static-text {
+            color: #fff;
+            padding: 20px 10px;
+            text-align: center;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <div class="static-text">发热门诊输液管理系统</div>
+            <a href="{% url 'patient_profile' %}">查看个人信息</a>
+            <a href="{% url 'patient_doctor_list' %}">查看医生信息</a>
+            <a href="{% url 'make_patient_appointment' %}">输液预约</a>
+            <a href="{% url 'view_appointment_history' %}">查看预约历史</a>
+            <a href="{% url 'patient_infusion' %}">报到及输液</a>
+            <a href="#" onclick="logout()">退出登录</a>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="main-content" id="mainContent">
+            <h1>欢迎访问病人主页</h1>
+            <p>在这里您可以查看个人信息、查看医生信息、进行输液预约、查看预约历史以及报到及输液。</p>
+        </div>
+    </div>
+
+    <script>
+        // 退出登录
+        function logout() {
+            // 执行退出登录的逻辑，例如清除会话信息
+            // 这里假设使用 AJAX 请求来告知服务器清除相应的会话信息
+            fetch('/logout', {
+                method: 'POST', // 假设使用 POST 请求
+                credentials: 'same-origin', // 发送同源凭证以便服务器清除相应的会话信息
+            })
+            .then(response => {
+                // 构建登录页面 URL
+                const loginUrl = '/user/patient/login/';
+                // 重定向到登录页面
+                window.location.href = loginUrl;
+            })
+            .catch(error => {
+                console.error('退出登录失败：', error);
+            });
+        }
+    </script>
+</body>
+</html>

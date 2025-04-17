@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>预约页面</title>
+    <!-- 引入 Element UI 的 CSS 文件 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <style>
+        .container {
+            width: 80%;
+            margin: auto;
+            padding-top: 50px;
+        }
+        .patient-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .patient-info label {
+            width: 100px;
+            text-align: right;
+            margin-right: 10px;
+        }
+        .patient-info span {
+            flex: 1;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="app" class="container">
+        <!-- 病人信息 -->
+        <div class="patient-info">
+            <label>病人姓名：</label>
+            <span>{{ patientName }}</span>
+        </div>
+
+        <!-- 预约表单 -->
+        <el-form ref="appointmentForm" :model="form" label-width="100px">
+            <el-form-item label="医生">
+                <el-select v-model="form.doctor" placeholder="请选择">
+                    <el-option
+                        v-for="doctor in doctors"
+                        :key="doctor.doctor_id"
+                        :label="doctor.name"
+                        :value="doctor.doctor_id">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="预约日期">
+                <el-date-picker
+                    v-model="form.appointmentDate"
+                    name="appointmentDate"
+                    type="date"
+                    placeholder="选择预约日期"
+                    value-format="yyyy-MM-dd"
+                    :picker-options="pickerOptions">
+                </el-date-picker>
+            </el-form-item>
+            <el-form-item label="预约时段">
+                <el-input-number v-model="form.appointmentHour" name="appointmentHour" :min="10" :max="16" label="预约时段" controls-position="right" :precision="0">
+                    <template slot="append">时</template>
+                </el-input-number>
+                <span style="font-size: 12px; color: #999;">（例如：10代表10点到11点）</span>
+            </el-form-item>
+           <!-- 医生余额展示 -->
+            <el-form-item label="医生预约余额:">
+                <span>[[ doctorBalance ]]</span>
+            </el-form-item>
+            <!-- 医生余额已满提示 -->
+            <el-form-item v-if="doctorBalanceZero" label="">
+                <span style="color: red;">医生预约余额已满，请选择其他时间。</span>
+            </el-form-item>
+            <el-form-item label="输液原因">
+                <el-input v-model="form.reason" placeholder="请输入输液原因"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="submitAppointment" :disabled="!form.reason || doctorBalanceZero">预约</el-button>
+                <el-button @click="navigateToDashboard">返回仪表板</el-button>
+            </el-form-item>
+        </el-form>
+
+    </div>
+
+    <!-- 引入 Vue.js ,Axios和 Element UI 的 JavaScript 文件 -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script>
+        new Vue({
+            delimiters: ["[[", "]]"],
+            el: '#app',
+            data() {
+                return {
+                    patientName: '{{ patientName }}', // 病人姓名
+                    form: {
+                        doctor: '', // 医生
+                        appointmentDate: '', // 预约日期
+                        appointmentHour: '', // 预约时段
+                        reason: '' // 输液原因
+                    },
+                    doctors: [], // 医生列表
+                    doctorBalance: null,
+                    doctorBalanceZero: false, // 初始化为假值
+                    pickerOptions: {
+                        disabledDate(time) {
+                            const today = new Date();
+                            const twoDaysLater = new Date(today);
+                            twoDaysLater.setDate(today.getDate() + 2); // 设置日期为当前日期加两天
+                            return time.getTime() < today || time.getTime() > twoDaysLater;
+                        }
+                    },
+                };
+            },
+            methods: {
+                // 获取医生列表
+                fetchDoctors() {
+                    axios.get('/appointment/get_doctors/')
+                        .then(response => {
+                            this.doctors = response.data;
+                        })
+                        .catch(error => {
+                            console.error('获取医生列表失败', error);
+                        });
+                },
+                fetchDoctorBalance(doctorId, appointmentDate, appointmentHour) {
+                    axios.get(`/appointment/get_doctor_balance/?doctor_id=${doctorId}&date=${appointmentDate}&hour=${appointmentHour}`)
+                        .then(response => {
+                            console.log("Response:", response.data);
+                            this.doctorBalance = response.data.balance;
+                            console.log('医生预约余额:', this.doctorBalance);
+
+                            // 如果医生预约余额为零，设置 doctorBalanceZero 为真
+                            this.doctorBalanceZero = (this.doctorBalance === 0);
+                        })
+                        .catch(error => {
+                            console.error('获取医生预约余额失败', error);
+                        });
+                },
+                // 跳转到仪表盘
+                navigateToDashboard() {
+                    window.location.href = '/user/patient_dashboard/';
+                },
+                submitAppointment() {
+                    // 构造表单数据
+                    const formData = {
+                        patientName: this.patientName, // 病人姓名
+                        doctor: this.form.doctor,
+                        appointmentDate: this.form.appointmentDate,
+                        appointmentHour: this.form.appointmentHour,
+                        reason: this.form.reason
+                    };
+
+                    // 发送POST请求，提交预约表单数据
+                    axios.post('/appointment/submit_appointment/', formData)
+                        .then(response => {
+                            console.log('预约成功！', response.data);
+                            // 显示提交成功的提示框
+                            this.$message({
+                                message: '预约成功！',
+                                type: 'success'
+                            });
+                        })
+                        .catch(error => {
+                            console.error('预约失败！', error);
+                            // 显示提交失败的提示框
+                            this.$message.error('预约失败，请稍后重试！');
+                        });
+                }
+
+            },
+            watch: {
+                'form.doctor': function(newDoctor, oldDoctor) {
+                    // 当用户选择医生时，自动获取医生预约余额
+                    if (newDoctor && this.form.appointmentDate && this.form.appointmentHour) {
+                        this.fetchDoctorBalance(newDoctor, this.form.appointmentDate, this.form.appointmentHour);
+                    }
+                },
+                'form.appointmentDate': function(newDate, oldDate) {
+                    // 当用户选择日期时，自动获取医生预约余额
+                    if (this.form.doctor && newDate && this.form.appointmentHour) {
+                        this.fetchDoctorBalance(this.form.doctor, newDate, this.form.appointmentHour);
+                    }
+                },
+                'form.appointmentHour': function(newHour, oldHour) {
+                    // 当用户选择时段时，自动获取医生预约余额
+                    if (this.form.doctor && this.form.appointmentDate && newHour) {
+                        this.fetchDoctorBalance(this.form.doctor, this.form.appointmentDate, newHour);
+                    }
+                }
+            },
+            created() {
+                // 页面加载时获取医生列表
+                this.fetchDoctors();
+            }
+        });
+    </script>
+</body>
+</html>

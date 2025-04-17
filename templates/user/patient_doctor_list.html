@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>所有医生信息</title>
+    <style>
+        /* 按钮样式 */
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* 鼠标悬停时的样式 */
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h2>所有医生信息</h2>
+    <ul>
+        {% for doctor in doctors %}
+            <div class="doctor-info">
+                <p>{{ doctor.name }} - {{ doctor.department }} - {{ doctor.title }}</p>
+                <a href="{% url 'doctor_detail' doctor_id=doctor.doctor_id %}" class="btn">查看更多信息</a>
+            </div>
+        {% endfor %}
+    </ul>
+</body>
+</html>

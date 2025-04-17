@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>医院发热门诊自助输液管理系统</title>
+    <!-- 引入 Bootstrap 的 CSS 文件 -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <!-- 自定义的 CSS 文件 -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        /* 自定义样式 */
+        .container {
+            text-align: center; /* 让容器内的文本水平居中 */
+        }
+        .btn-container {
+            display: flex;
+            flex-direction: column; /* 将按钮容器设置为垂直排列 */
+            align-items: center; /* 按钮垂直居中对齐 */
+            padding-top: 20px; /* 顶部内边距，使按钮稍微向下移动 */
+        }
+        .btn-container .btn {
+            width: 200px; /* 设置按钮宽度 */
+            font-size: 25px; /* 设置按钮字体大小 */
+            margin: 20px 0; /* 设置按钮上下间距 */
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="jumbotron">
+        <h1 class="display-4">医院发热门诊自助输液管理系统</h1>
+        <p class="lead">Hospital Fever Clinic Self-service Infusion Management System</p>
+    </div>
+    <div class="btn-container">
+        <div class="mb-3">
+            <a href="{% url 'doctor_login' %}" class="btn btn-primary btn-lg btn-block btn-sm">医生登录</a>
+        </div>
+        <div class="mb-3">
+        <a href="{% url 'nurse_login' %}" class="btn btn-primary btn-lg btn-block btn-sm">护士登录</a>
+        </div>
+        <div>
+            <a href="{% url 'patient_login' %}" class="btn btn-primary btn-lg btn-block btn-sm">病人登录</a>
+        </div>
+    </div>
+</div>
+<!-- 引入 Bootstrap 的 JavaScript 文件 -->
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+</body>
+</html>

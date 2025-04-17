@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>护士输液管理</title>
+    <!-- 引入 Element UI 的 CSS 文件 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <style>
+        .container {
+            width: 100%;
+            margin: auto;
+            padding-top: 50px;
+        }
+        .nurse-actions {
+            margin-top: 20px;
+        }
+        .nurse-actions button {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="container">
+        <el-table :data="infusions" style="width: 100%">
+            <el-table-column prop="doctor_name" label="医生姓名"></el-table-column>
+            <el-table-column prop="nurse_name" label="护士姓名"></el-table-column>
+            <el-table-column prop="patient_name" label="病人姓名"></el-table-column>
+            <el-table-column prop="appointment_date" label="预约日期"></el-table-column>
+            <el-table-column prop="appointment_time" label="预约时段">
+                <template slot-scope="scope">
+                    <span v-html="formatAppointmentTime(scope.row.appointment_time)"></span>
+                </template>
+            </el-table-column>
+            <el-table-column prop="seat_number" label="座位号"></el-table-column>
+            <el-table-column prop="medication" label="药物"></el-table-column>
+            <el-table-column prop="dosage" label="剂量"></el-table-column>
+            <el-table-column prop="check_in_status" label="报到状态"></el-table-column>
+            <el-table-column prop="sit_down_status" label="坐下状态"></el-table-column>
+            <el-table-column label="输液状态">
+              <template slot-scope="scope">
+                <span v-if="scope.row.infusion_status === 'not_started'">未开始</span>
+                <span v-else-if="scope.row.infusion_status === 'infusing'">输液中</span>
+                <span v-else-if="scope.row.infusion_status === 'waiting_for_removal'">待拔针</span>
+                <span v-else-if="scope.row.infusion_status === 'completed'">输液完成</span>
+                <span v-else-if="scope.row.infusion_status === 'cancelled'">已取消</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="140" align="center">
+                <template slot-scope="scope">
+                    <div class="action-buttons">
+                         <!-- 显示拿药并输液按钮 -->
+                         <el-button type="text" v-if="scope.row.infusion_status === 'not_started'"@click="handleGetMedication(scope.row)">拿药并输液</el-button>
+                         <!-- 显示不可点击的拔针按钮 -->
+                         <el-button type="text" v-else-if="scope.row.infusion_status === 'infusing'" :style="{ color: 'grey' }">去拔针</el-button>
+                         <!-- 显示可点击的拔针按钮 -->
+                         <el-button type="text" v-else-if="scope.row.infusion_status === 'waiting_for_removal'"@click="handleRemoveNeedle(scope.row)" >去拔针</el-button>
+                         <!-- 添加取消按钮 -->
+                         <el-button type="text" v-if="scope.row.infusion_status === 'not_started'" @click="handleCancel(scope.row)">取消</el-button>
+                    </div>
+                </template>
+            </el-table-column>
+        </el-table>
+
+        <el-button type="primary" @click="navigateToDashboard">返回仪表盘</el-button>
+    </div>
+
+    <!-- 引入 Vue.js -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <!-- 引入 axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- 引入 Element UI 库 -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+              infusions: [], // 存放从后端获取的输液历史数据
+              timer: null // 用于存储定时器的引用
+            },
+
+            methods: {
+                formatAppointmentTime(time) {
+                    // 假设每个预约时段持续1小时
+                    const startTime = `${time}点`;
+                    const endTime = `${parseInt(time) + 1}点`;
+                    return `${startTime}到${endTime}`;
+                },
+                getInfusions() {
+                    // 向后端发送请求以获取输液历史数据
+                    axios.get('/infusion/get_nurse_infusion/')
+                        .then(response => {
+                            // 成功获取数据后更新infusions数组
+                            this.infusions = response.data.infusions;
+                        })
+                        .catch(error => {
+                            console.error('Error fetching infusions:', error);
+                        });
+                },
+                //拿药并输液
+                handleGetMedication(row) {
+                    axios.patch(`/infusion/updateGetMedicationAndInfusionStatus/${row.infusion_id}/`)
+                        .then(response => {
+                            // 检查服务器响应的状态
+                            if (response.data.status === 'success') {
+                                // 如果成功，刷新输液历史记录
+                                this.getInfusions();
+                                console.log("拿药并输液成功！");
+                                // 显示成功消息
+                                this.$message({
+                                    message: '拿药并输液成功！',
+                                    type: 'success'
+                                });
+                            } else {
+                                // 显示服务器返回的错误消息
+                                this.$message.error(response.data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error updating get medication and infusion status:', error);
+                            // 在控制台记录错误，并显示通用错误消息
+                            this.$message.error('拿药并输液失败，请重试！');
+                        });
+                },
+                handleRemoveNeedle(row) {
+                    axios.patch(`/infusion/updateRemoveNeedleStatus/${row.infusion_id}/`)
+                        .then(response => {
+                            // 检查服务器响应的状态
+                            if (response.data.status === 'success') {
+                                // 如果成功，刷新输液历史记录
+                                this.getInfusions();
+                                console.log("拔针成功！");
+                                // 显示成功消息
+                                this.$message({
+                                    message: '拔针成功！',
+                                    type: 'success'
+                                });
+                            } else {
+                                // 显示服务器返回的错误消息
+                                this.$message.error(response.data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error updating remove needle status:', error);
+                            // 在控制台记录错误，并显示通用错误消息
+                            this.$message.error('拔针失败，请重试！');
+                        });
+                },
+                handleCancel(row) {
+                    // 发送 PATCH 请求取消输液记录
+                    axios.patch(`/infusion/updateCancelStatus/${row.infusion_id}/`)
+                        .then(response => {
+                            // 检查服务器响应的状态
+                            if (response.data.status === 'success') {
+                                // 如果成功，刷新输液历史记录
+                                this.getInfusions();
+                                console.log("取消成功！");
+                                // 显示成功消息
+                                this.$message({
+                                    message: '取消成功！',
+                                    type: 'success'
+                                });
+                            } else {
+                                // 显示服务器返回的错误消息
+                                this.$message.error(response.data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error updating cancel status:', error);
+                            // 在控制台记录错误，并显示通用错误消息
+                            this.$message.error('取消失败，请重试！');
+                        });
+                },
+
+                // 跳转到仪表盘
+                navigateToDashboard() {
+                    window.history.back();
+                },
+                // 设置定时器
+                startTimer() {
+                    this.timer = setInterval(this.getInfusions, 100); // 100ms执行一次getInfusions方法
+                },
+                // 清除定时器
+                stopTimer() {
+                    clearInterval(this.timer);
+                    this.timer = null;
+                }
+            },
+            mounted() {
+                // 在组件加载完成后立即获取数据
+                this.getInfusions();
+                // 在组件加载完成后设置定时器
+                this.startTimer();
+            },
+            beforeDestroy() {
+                // 在组件销毁前清除定时器
+                this.stopTimer();
+            }
+
+        });
+    </script>
+</body>
+</html>

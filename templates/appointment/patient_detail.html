@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>病人个人信息</title>
+    <style>
+        /* 按钮样式 */
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* 鼠标悬停时的样式 */
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* 编辑表单容器样式 */
+        #editContainer {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>病人个人信息</h2>
+    <p>姓名：{{ patient.name }}</p>
+    {% if patient.gender == 'm' %}
+        <p>性别：男</p>
+    {% elif patient.gender == 'f' %}
+        <p>性别：女</p>
+    {% endif %}
+    <p>年龄：{{ patient.age }}</p>
+    <p>家庭地址：{{ patient.address }}</p>
+    <p>病人介绍：{{ patient.info }}</p>
+    <p>联系电话/账号：{{ patient.contact_number }}</p>
+
+    <!-- 返回按钮 -->
+    <a href="/user/doctor_dashboard/" class="btn">返回仪表板</a>
+    <a href="/appointment/appointment_handling/" class="btn">返回预约处理</a>
+
+</body>
+</html>

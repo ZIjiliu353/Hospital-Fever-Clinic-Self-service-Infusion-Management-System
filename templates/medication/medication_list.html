@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>药物管理</title>
+    <!-- 引入 Element UI 的 CSS 文件 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+<body>
+    <div id="app">
+        <el-table
+            :data="medications"
+            style="width: 100%">
+            <el-table-column
+                prop="name"
+                label="药物名">
+            </el-table-column>
+            <el-table-column
+                prop="expiration_date"
+                label="保质期到期日">
+            </el-table-column>
+            <el-table-column
+                prop="current_quantity"
+                label="当前存储量">
+            </el-table-column>
+            <el-table-column
+                label="操作"
+                width="200"
+                align="center">
+                <template slot-scope="{ row }">
+                    <el-button type="text" @click="editMedication(row)">编辑</el-button>
+                    <el-button type="text" @click="deleteMedication(row)">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+            <!-- 编辑药物的模态框 -->
+        <el-dialog
+          title="编辑药物信息"
+          :visible.sync="editDialogVisible"
+          width="30%">
+          <el-form :model="editForm" label-width="80px">
+
+            <!-- 添加隐藏的 ID 字段 -->
+            <input type="hidden" v-model="editForm.id">
+
+            <el-form-item label="药物名" prop="name">
+              <el-input v-model="editForm.name"></el-input>
+            </el-form-item>
+            <el-form-item label="保质期到期日" prop="expiration_date">
+              <el-date-picker
+                v-model="editForm.expiration_date"
+                type="date"
+                placeholder="选择日期">
+              </el-date-picker>
+            </el-form-item>
+            <el-form-item label="当前存储量" prop="current_quantity">
+              <el-input v-model="editForm.current_quantity"></el-input>
+            </el-form-item>
+          </el-form>
+          <div slot="footer" class="dialog-footer">
+            <el-button @click="editDialogVisible = false">取消</el-button>
+            <el-button type="primary" @click="saveEditedMedication">保存</el-button>
+          </div>
+        </el-dialog>
+
+        <!-- 添加药物按钮 -->
+        <el-button type="primary" @click="showAddForm">添加药物</el-button>
+        <!-- 返回仪表盘按钮 -->
+        <el-button @click="navigateToDashboard">返回仪表盘</el-button>
+
+        <!-- 添加药物表单 -->
+        <el-form :model="formData" ref="formData" label-width="80px" v-if="showForm">
+            <el-form-item label="药物名" prop="name">
+                <el-input id="nameField" v-model="formData.name"></el-input>
+            </el-form-item>
+            <el-form-item label="保质期到期日" prop="expiration_date">
+                <el-date-picker id="expirationDateField" v-model="formData.expiration_date" type="date"></el-date-picker>
+            </el-form-item>
+            <el-form-item label="当前存储量" prop="current_quantity">
+                <el-input id="quantityField" v-model="formData.current_quantity"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="addMedication">确认添加</el-button>
+                <el-button @click="cancelAdd">取消</el-button>
+            </el-form-item>
+        </el-form>
+    </div>
+
+    <!-- 引入 Vue.js ,Axios 和 Element UI 的 JavaScript 文件 -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data() {
+                return {
+                    medications: [], // 存储药物信息的数组
+                    formData: { name: '', expiration_date: '', current_quantity: '' }, // 添加药物表单数据
+                    showForm: false ,// 控制添加药物表单的显示与隐藏
+                    editDialogVisible: false, // 编辑药物模态框的显示状态
+                    editForm: { name: '', expiration_date: '', current_quantity: '' } , // 编辑药物表单数据
+                    deleteDialogVisible: false, // 删除确认对话框的显示状态
+                };
+            },
+            methods: {
+                // 获取药物列表
+                fetchMedications() {
+                    // 使用 AJAX 请求从后端获取药物列表数据
+                    axios.get('/medication/medication_list/', {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+
+                        }
+                    })
+                        .then(response => {
+                            // 将获取到的数据赋值给 this.medications
+                            this.medications = response.data.medications;
+                            // 打印药物数据到控制台
+                            console.log('Medications:', this.medications);
+                        })
+                        .catch(error => {
+                            // 处理获取药物列表失败的情况
+                            console.error('获取药物列表失败:', error);
+                        });
+                },
+                // 显示添加药物表单
+                showAddForm() {
+                    this.showForm = true;
+                },
+                // 跳转到仪表盘
+                    navigateToDashboard() {
+                    window.history.back();
+                },
+                // 取消添加药物操作
+                cancelAdd() {
+                    this.showForm = false;
+                    // 清空表单数据
+                    this.formData = { name: '', expiration_date: '', current_quantity: '' };
+                },
+                // 添加药物
+                 addMedication() {
+                    // 将日期格式化为 YYYY-MM-DD
+                    let expirationDate = new Date(this.formData.expiration_date);
+                    let formattedDate = `${expirationDate.getFullYear()}-${String(expirationDate.getMonth() + 1).padStart(2, '0')}-${String(expirationDate.getDate()).padStart(2, '0')}`;
+
+                    // 更新 formData 中的 expiration_date 为格式化后的日期
+                    this.formData.expiration_date = formattedDate;
+
+                    // 发送POST请求将表单数据发送到后端
+                    axios.post('/medication/add_medication_api/', this.formData)
+                        .then(response => {
+                            // 添加药物成功后的处理逻辑，例如刷新药物列表
+                            this.fetchMedications();
+                            // 清空表单数据
+                            this.formData = { name: '', expiration_date: '', current_quantity: '' };
+                            // 隐藏添加药物表单
+                            this.showForm = false;
+                            // 显示成功消息
+                            this.$message.success('药物添加成功');
+                        })
+                        .catch(error => {
+                            // 处理添加药物失败的情况
+                            console.error('添加药物失败:', error);
+                            // 显示失败消息
+                            this.$message.error('药物添加失败，请稍后重试');
+                        });
+                },
+                // 编辑药物
+                editMedication(medication) {
+                    // 将要编辑的药物信息填充到编辑表单中
+                    this.editForm.id = medication.medication_id; // 将药物的 ID 设置到编辑表单中
+                    this.editForm.name = medication.name;
+                    this.editForm.expiration_date = medication.expiration_date;
+                    this.editForm.current_quantity = medication.current_quantity;
+                    // 打开编辑药物模态框
+                    this.editDialogVisible = true;
+                },
+                // 保存编辑后的药物信息
+                saveEditedMedication() {
+                    //将日期格式化为 YYYY-MM-DD
+                    let expirationDate = new Date(this.editForm.expiration_date);
+                    let formattedDate = `${expirationDate.getFullYear()}-${String(expirationDate.getMonth() + 1).padStart(2, '0')}-${String(expirationDate.getDate()).padStart(2, '0')}`;
+                    this.editForm.expiration_date = formattedDate;
+                    // 发送更新药物信息的请求
+                    axios.put(`/medication/edit_medication/`, this.editForm) // 发送药物的编辑表单数据
+                    .then(response => {
+                        // 更新成功后的操作
+                        console.log('药物信息更新成功:', response.data);
+                        this.$message.success('药物修改成功');
+                        // 关闭编辑模态框
+                        this.editDialogVisible = false;
+                        // 重新加载药物列表
+                        this.fetchMedications();
+                    })
+                    .catch(error => {
+                        // 处理更新失败的情况
+                        console.error('更新药物信息失败:', error);
+                        this.$message.error('药物修改失败，请稍后重试');
+                    });
+                },
+                // 删除药物
+                deleteMedication(medication) {
+                    // 使用原生 JavaScript confirm 函数弹出确认对话框
+                    console.log("Deleting medication:", medication);
+                    const confirmed = confirm(`确认删除药物 "${medication.name}" 吗?`);
+                    if (confirmed) {
+                        // 用户点击了确认按钮，向后端发送删除请求
+                        axios.delete(`/medication/delete_medication/${medication.medication_id}/`)
+                            .then(response => {
+                                // 删除成功后的处理逻辑，例如刷新药物列表
+                                this.fetchMedications();
+                                // 提示删除成功
+                                this.$message.success('删除成功');
+                            })
+                            .catch(error => {
+                                // 处理删除药物失败的情况
+                                console.error('删除药物失败:', error);
+                                // 提示删除失败
+                                this.$message.error('删除失败，请稍后重试');
+                            });
+                    } else {
+                        // 用户点击了取消按钮，不执行任何操作
+                    }
+                },
+            },
+            mounted() {
+                // 页面加载时获取药物列表数据
+                this.fetchMedications();
+            }
+        });
+    </script>
+</body>
+</html>

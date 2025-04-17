@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>预约历史</title>
+    <!-- 引入 Element UI 的 CSS 文件 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+<body>
+    <div id="app">
+
+        <el-table
+            :data="appointments"
+            style="width: 100%">
+            <el-table-column
+                prop="patient_name"
+                label="病人名字">
+            </el-table-column>
+            <el-table-column
+                prop="doctor_name"
+                label="医生名字">
+            </el-table-column>
+            <el-table-column
+                prop="appointment_date"
+                label="预约日期">
+            </el-table-column>
+            <el-table-column
+                prop="appointment_time"
+                label="预约时段"
+                :formatter="formatAppointmentTime">
+            </el-table-column>
+            <el-table-column
+                prop="infusion_reason"
+                label="输液原因">
+            </el-table-column>
+            <el-table-column
+                prop="medication"
+                label="药物">
+            </el-table-column>
+            <el-table-column
+                prop="dosage"
+                label="剂量">
+            </el-table-column>
+            <el-table-column
+                prop="status"
+                label="状态">
+                <template slot-scope="scope">
+                    <span v-if="scope.row.status === 'pending'">待处理</span>
+                    <span v-if="scope.row.status === 'completed'">已完成</span>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-button @click="goToDashboard" type="primary" style="margin-bottom: 10px;">返回仪表盘</el-button>
+    </div>
+    <!-- 引入 Vue.js -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <!-- 引入 axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- 引入 Element UI 库 -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                appointments: [] // 这里存放从后端获取的预约历史数据
+            },
+            methods: {
+                formatAppointmentTime(row) {
+                    const startTime = row.appointment_time;
+                    const endTime = startTime + 1; // 结束时间为开始时间加1
+                    return `${startTime}点-${endTime}点`;
+                },
+                getAppointments() {
+                    axios.get('/appointment/get_appointment_data/')
+                        .then(response => {
+                            this.appointments = response.data.appointments;
+                        })
+                        .catch(error => {
+                            console.error('Error fetching appointments:', error);
+                        });
+                },
+                goToDashboard() {
+                    window.location.href = '/user/patient_dashboard/'; // 返回到仪表盘页面的路径
+                }
+            },
+            mounted() {
+                this.getAppointments(); // 在页面加载完成后调用获取预约历史数据的方法
+            }
+        });
+    </script>
+</body>
+</html>
