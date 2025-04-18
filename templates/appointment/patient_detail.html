@@ -30,21 +30,21 @@
 </head>
 <body>
 
-    <h2>病人个人信息</h2>
-    <p>姓名：{{ patient.name }}</p>
+    <h2>patient_details</h2>
+    <p>name：{{ patient.name }}</p>
     {% if patient.gender == 'm' %}
-        <p>性别：男</p>
+        <p>gender：male</p>
     {% elif patient.gender == 'f' %}
-        <p>性别：女</p>
+        <p>gender：female</p>
     {% endif %}
-    <p>年龄：{{ patient.age }}</p>
-    <p>家庭地址：{{ patient.address }}</p>
-    <p>病人介绍：{{ patient.info }}</p>
-    <p>联系电话/账号：{{ patient.contact_number }}</p>
+    <p>age：{{ patient.age }}</p>
+    <p>address：{{ patient.address }}</p>
+    <p>information：{{ patient.info }}</p>
+    <p>contact_number：{{ patient.contact_number }}</p>
 
     <!-- 返回按钮 -->
-    <a href="/user/doctor_dashboard/" class="btn">返回仪表板</a>
-    <a href="/appointment/appointment_handling/" class="btn">返回预约处理</a>
+    <a href="/user/doctor_dashboard/" class="btn">back to dashboard</a>
+    <a href="/appointment/appointment_handling/" class="btn">back to handle appointment</a>
 
 </body>
 </html>

@@ -46,8 +46,8 @@ def get_patient_infusion(request):
             appointment_time = appointment.hour
             medication = appointment.medication.name
             dosage = appointment.dose
-            check_in_status = '未报到' if not infusion.check_in_status else '已报到'
-            sit_down_status = '未坐下' if not infusion.sit_down_status else '已坐下'
+            check_in_status = 'Not Chk-In' if not infusion.check_in_status else 'Chk-In'
+            sit_down_status = 'not_seated' if not infusion.sit_down_status else 'seated'
             infusion_status = infusion.infusion_status
 
             # 添加到输液记录列表
@@ -198,8 +198,8 @@ def get_nurse_infusion(request):
             appointment_time = appointment.hour
             medication = appointment.medication.name
             dosage = appointment.dose
-            check_in_status = '未报到' if not infusion.check_in_status else '已报到'
-            sit_down_status = '未坐下' if not infusion.sit_down_status else '已坐下'
+            check_in_status = 'Not Chk-In' if not infusion.check_in_status else 'Chk-In'
+            sit_down_status = 'not_seated' if not infusion.sit_down_status else 'seated'
             infusion_status = infusion.infusion_status
 
             # 添加到输液记录列表
@@ -321,8 +321,8 @@ def get_nurse_infusion_history(request):
             appointment_time = appointment.hour
             medication = appointment.medication.name
             dosage = appointment.dose
-            check_in_status = '未报到' if not infusion.check_in_status else '已报到'
-            sit_down_status = '未坐下' if not infusion.sit_down_status else '已坐下'
+            check_in_status = 'Not Chk-In' if not infusion.check_in_status else 'Chk-In'
+            sit_down_status = 'not_seated ' if not infusion.sit_down_status else 'seated '
             infusion_status = infusion.infusion_status
 
             # 添加到输液记录列表

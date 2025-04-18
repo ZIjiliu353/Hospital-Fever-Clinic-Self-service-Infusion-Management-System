@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>病人输液</title>
+    <title>Patient infusion</title>
     <!-- 引入 Element UI 的 CSS 文件 -->
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
     <style>
@@ -23,46 +23,46 @@
 <body>
     <div id="app" class="container">
         <el-table :data="infusions" style="width: 100%">
-            <el-table-column prop="doctor_name" label="医生姓名"></el-table-column>
-            <el-table-column prop="nurse_name" label="护士姓名"></el-table-column>
-            <el-table-column prop="patient_name" label="病人姓名"></el-table-column>
-            <el-table-column prop="appointment_date" label="预约日期"></el-table-column>
-            <el-table-column prop="appointment_time" label="预约时段">
+            <el-table-column prop="doctor_name" label="doctor"></el-table-column>
+            <el-table-column prop="nurse_name" label="nurse"></el-table-column>
+            <el-table-column prop="patient_name" label="patient"></el-table-column>
+            <el-table-column prop="appointment_date" label="date"></el-table-column>
+            <el-table-column prop="appointment_time" label="time">
                 <template slot-scope="scope">
                     <span v-html="formatAppointmentTime(scope.row.appointment_time)"></span>
                 </template>
             </el-table-column>
-            <el-table-column prop="seat_number" label="座位号"></el-table-column>
-            <el-table-column prop="medication" label="药物"></el-table-column>
-            <el-table-column prop="dosage" label="剂量"></el-table-column>
-            <el-table-column prop="check_in_status" label="报到状态"></el-table-column>
-            <el-table-column prop="sit_down_status" label="坐下状态"></el-table-column>
-            <el-table-column label="输液状态">
+            <el-table-column prop="seat_number" label="seat_num"></el-table-column>
+            <el-table-column prop="medication" label="medication"></el-table-column>
+            <el-table-column prop="dosage" label="dosage"></el-table-column>
+            <el-table-column prop="check_in_status" label="chk_status"></el-table-column>
+            <el-table-column prop="sit_down_status" label="sit_status"></el-table-column>
+            <el-table-column label="inf_status">
               <template slot-scope="scope">
-                <span v-if="scope.row.infusion_status === 'not_started'">未开始</span>
-                <span v-else-if="scope.row.infusion_status === 'infusing'">输液中</span>
-                <span v-else-if="scope.row.infusion_status === 'waiting_for_removal'">待拔针</span>
-                <span v-else-if="scope.row.infusion_status === 'completed'">输液完成</span>
-                <span v-else-if="scope.row.infusion_status === 'cancelled'">已取消</span>
+                <span v-if="scope.row.infusion_status === 'not_started'">not_started</span>
+                <span v-else-if="scope.row.infusion_status === 'infusing'">infusing</span>
+                <span v-else-if="scope.row.infusion_status === 'waiting_for_removal'">waiting_for_removal</span>
+                <span v-else-if="scope.row.infusion_status === 'completed'">completed</span>
+                <span v-else-if="scope.row.infusion_status === 'cancelled'">cancelled</span>
               </template>
             </el-table-column>
-            <el-table-column label="操作" width="140" align="center">
+            <el-table-column label="operations" width="140" align="center">
                 <template slot-scope="scope">
                     <div class="action-buttons">
                         <!-- 显示报到按钮 -->
-                        <el-button type="text" v-if="scope.row.check_in_status === '未报到' && scope.row.infusion_status !== 'cancelled'" @click="handleCheckIn(scope.row)">报到</el-button>
+                        <el-button type="text" v-if="scope.row.check_in_status === 'Not Chk-In' && scope.row.infusion_status !== 'cancelled'" @click="handleCheckIn(scope.row)">ckeck in</el-button>
                         <!-- 显示坐下按钮 -->
-                        <el-button type="text" v-if="scope.row.check_in_status === '已报到' && scope.row.sit_down_status === '未坐下'" @click="handleSitDown(scope.row)">坐下</el-button>
+                        <el-button type="text" v-if="scope.row.check_in_status === 'Chk-In' && scope.row.sit_down_status === 'not_seated'" @click="handleSitDown(scope.row)">sit down</el-button>
                         <!-- 显示输液完成按钮 -->
-                        <el-button type="text" v-if="scope.row.infusion_status === 'infusing'" @click="handleComplete(scope.row)">输液完成</el-button>
+                        <el-button type="text" v-if="scope.row.infusion_status === 'infusing'" @click="handleComplete(scope.row)">Complete infusion</el-button>
                         <!-- 显示取消按钮 -->
-                        <el-button type="text" v-if="scope.row.check_in_status === '未报到' && scope.row.infusion_status !== 'cancelled'" @click="handleCancel(scope.row)">取消</el-button>
+                        <el-button type="text" v-if="scope.row.check_in_status === 'Not Chk-In' && scope.row.infusion_status !== 'cancelled'" @click="handleCancel(scope.row)">cancel</el-button>
                     </div>
                 </template>
             </el-table-column>
         </el-table>
 
-        <el-button type="primary" @click="navigateToDashboard">返回仪表盘</el-button>
+        <el-button type="primary" @click="navigateToDashboard">back to dashboard</el-button>
     </div>
 
     <!-- 引入 Vue.js -->
@@ -82,9 +82,9 @@
             methods: {
                 formatAppointmentTime(time) {
                     // 假设每个预约时段持续1小时
-                    const startTime = `${time}点`;
-                    const endTime = `${parseInt(time) + 1}点`;
-                    return `${startTime}到${endTime}`;
+                    const startTime = `${time}`;
+                    const endTime = `${parseInt(time) + 1}`;
+                    return `${startTime}-${endTime} O'clock`;
                 },
                 getInfusions() {
                     // 向后端发送请求以获取输液历史数据
@@ -108,13 +108,13 @@
                             console.log("报到成功！");
                             // 添加处理成功的提示信息
                             this.$message({
-                                message: '报到成功！',
+                                message: 'Registration successful!',
                                 type: 'success'
                             });
                         })
                         .catch(error => {
                             console.error('Error fetching infusions:', error);
-                            this.$message.error('报到失败，请重试！');
+                            this.$message.error('Registration failed, please try again!');
                         });
 
                 },
@@ -129,13 +129,13 @@
                         console.log("坐下成功！");
                         // 添加处理成功的提示信息
                         this.$message({
-                            message: '坐下成功！',
+                            message: 'Sitting down successfully！',
                             type: 'success'
                         });
                     })
                     .catch(error => {
                         console.error('Error updating sit down status:', error);
-                        this.$message.error('坐下失败，请重试！');
+                            this.$message.error('Sitting down failed, please try again!');
                     });
                 },
                 handleComplete(row) {
@@ -148,7 +148,7 @@
                                 console.log("输液完成成功！");
                                 // 显示成功消息
                                 this.$message({
-                                    message: '输液完成成功！',
+                                    message: 'Infusion completed successfully!',
                                     type: 'success'
                                 });
                             } else {
@@ -159,7 +159,7 @@
                         .catch(error => {
                             console.error('Error updating complete status:', error);
                             // 在控制台记录错误，并显示通用错误消息
-                            this.$message.error('输液完成失败，请重试！');
+                            this.$message.error('Infusion completion failed, please try again!');
                         });
                 },
                 handleCancel(row) {
@@ -171,13 +171,13 @@
                             console.log("取消成功！");
                             // 添加处理成功的提示信息
                             this.$message({
-                                message: '取消成功！',
+                                message: 'Cancelled successfully!',
                                 type: 'success'
                             });
                         })
                         .catch(error => {
                             console.error('Error updating cancel status:', error);
-                            this.$message.error('取消失败，请重试！');
+                            this.$message.error('Cancel failed, please try again!');
                         });
                 },
 

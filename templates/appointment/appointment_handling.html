@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>医生预约处理</title>
+    <title>Doctor appointment processing</title>
     <!-- 引入 Element UI 的 CSS 文件 -->
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
     <style>
@@ -29,46 +29,46 @@
             style="width: 100%">
             <el-table-column
                 prop="doctor_name"
-                label="医生名字">
+                label="doctor">
             </el-table-column>
             <el-table-column
                 prop="patient_name"
-                label="病人名字">
+                label="patient">
             </el-table-column>
             <el-table-column
                 prop="appointment_date"
-                label="预约日期">
+                label="date">
             </el-table-column>
             <el-table-column
                 prop="appointment_time"
-                label="预约时段"
+                label="time"
                 :formatter="formatAppointmentTime">
             </el-table-column>
             <el-table-column
                 prop="infusion_reason"
-                label="输液原因">
+                label="reason">
             </el-table-column>
             <el-table-column
                 prop="medication"
-                label="药物">
+                label="medication">
             </el-table-column>
             <el-table-column
                 prop="dosage"
-                label="剂量">
+                label="dosage">
             </el-table-column>
             <el-table-column
                 prop="status"
-                label="状态">
+                label="status">
                 <template slot-scope="scope">
-                    <span v-if="scope.row.status === 'pending'">待处理</span>
-                    <span v-if="scope.row.status === 'completed'">已完成</span>
+                    <span v-if="scope.row.status === 'pending'">pending</span>
+                    <span v-if="scope.row.status === 'completed'">completed</span>
                 </template>
             </el-table-column>
-            <el-table-column label="操作" width="140"  align="center">
+            <el-table-column label="operations" width="120"  align="center">
                 <template slot-scope="scope">
                     <div class="action-buttons">
-                        <el-button type="text" size="mini" @click="handleAppointment(scope.row)">预约处理</el-button>
-                        <el-button type="text" size="mini" @click="viewPatientDetails(scope.row)">病人详情</el-button>
+                        <el-button type="text" size="mini" @click="handleAppointment(scope.row)">handle</el-button>
+                        <el-button type="text" size="mini" @click="viewPatientDetails(scope.row)">viewPatientDetails</el-button>
                     </div>
                 </template>
             </el-table-column>
@@ -76,26 +76,26 @@
 
         <!-- 模态框 -->
         <el-dialog
-          title="处理预约"
+          title="handle"
           :visible.sync="dialogVisible"
           width="30%"
           center>
-          <el-form ref="form" :model="form" label-width="80px">
+          <el-form ref="form" :model="form" label-width="100px">
               <!-- 添加隐藏的预约ID字段 -->
             <input type="hidden" v-model="form.appointment_id">
 
-            <el-form-item label="药物">
-              <el-select v-model="form.medication" placeholder="请选择药物" @change="logMedication">
+            <el-form-item label="medication">
+              <el-select v-model="form.medication" placeholder="Please select medication" @change="logMedication">
                 <el-option
                     v-for="medication in medications"
                     :key="medication.id"
-                    :label="medication.name + '（余额：' + medication.current_quantity + '）'"
+                    :label="medication.name + '（balance：' + medication.current_quantity + '）'"
                     :value="medication.id"
                 ></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="剂量">
-                <el-select v-model="form.dosage" placeholder="请选择剂量">
+            <el-form-item label="dosage">
+                <el-select v-model="form.dosage" placeholder="Please select the dosage">
                     <el-option
                         v-for="num in 10"
                         :key="num"
@@ -106,12 +106,12 @@
             </el-form-item>
           </el-form>
           <span slot="footer" class="dialog-footer">
-            <el-button @click="dialogVisible = false">取消</el-button>
-            <el-button type="primary" @click="confirmHandle" :disabled="isConfirmDisabled">确认</el-button>
+            <el-button @click="dialogVisible = false">cancel</el-button>
+            <el-button type="primary" @click="confirmHandle" :disabled="isConfirmDisabled">confirm</el-button>
           </span>
         </el-dialog>
 
-        <el-button type="primary" @click="navigateToDashboard">返回仪表盘</el-button>
+        <el-button type="primary" @click="navigateToDashboard">back to dashboard</el-button>
     </div>
 
     <!-- 引入 Vue.js -->
@@ -224,7 +224,7 @@
                         .then(response => {
                             // 添加处理成功的提示信息
                             this.$message({
-                                message: '预约处理成功！',
+                                message: 'success！',
                                 type: 'success'
                             });
                             this.dialogVisible = false; // 关闭模态框
@@ -235,14 +235,14 @@
                         })
                         .catch(error => {
                             // 处理请求错误
-                            console.error('处理预约失败:', error);
-                            this.$message.error('预约处理失败，请重试！');
+                            console.error('error:', error);
+                            this.$message.error('Appointment processing failed, please try again!');
                         });
                 },
                 formatAppointmentTime(row) {
                     const startTime = row.appointment_time;
                     const endTime = startTime + 1; // 结束时间为开始时间加1
-                    return `${startTime}点-${endTime}点`;
+                    return `${startTime}-${endTime}O'clock`;
                 },
                 viewPatientDetails(row) {
                     const patient_id = row.patient_id;
